@@ -90,14 +90,12 @@ function ArraySlice(array = [], start = 0, end) {
 		Math.max((len + relativeStart), 0) :
 		Math.min(relativeStart, len);
 
-	let relativeEnd = (end === undefined) ?
-		len : toInteger(end);
-
+	let relativeEnd = (end === undefined) ? len : toInteger(end);
 	let final = relativeEnd < 0 ?
 		Math.max((len + relativeEnd), 0) :
 		Math.min(relativeEnd, len);
 
-	let count = Math.max(final - k, 0);
+	let count = Math.abs(final - k);
 
 	let proxy = new Proxy(o, handler);
 
@@ -105,7 +103,8 @@ function ArraySlice(array = [], start = 0, end) {
 		object: o,
 		length: count,
 		start: k,
-		end: final
+		end: final,
+		reverse: k > final
 	});
 
 	return proxy;
@@ -118,14 +117,11 @@ let handler = {
 		if (typeof property !== "symbol" &&
 		    Number.isInteger(+property) && +property >= 0) {
 
-			let index = p.start + (+property);
+			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
 
-			if (index >= p.end) {
+			if (p.reverse ? property < p.end : property >= p.end) {
 				return undefined;
 			}
-
-			return target[index];
-
 		} else if (property === "length") {
 			return p.length;
 		}
@@ -138,9 +134,10 @@ let handler = {
 
 		if (typeof property !== "symbol" &&
 			Number.isInteger(+property) && +property >= 0) {
-			property = p.start + (+property);
 
-			if (property >= p.end) {
+			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
+
+			if (p.reverse ? property < p.end : property >= p.end) {
 				throw new RangeError("Cannot modify original array out of bounds")
 			}
 		} else if (property === "length") {
