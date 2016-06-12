@@ -1,0 +1,108 @@
+{
+	"excludeFiles": [
+		"node_modules/**"
+	],
+
+	// Keywords
+	"requireCurlyBraces": [
+		"if",
+		"else",
+		"for",
+		"while",
+		"do",
+		"try",
+		"catch"
+	],
+
+	"requireSpaceBeforeKeywords": [
+		"else",
+		"while",
+		"catch"
+	],
+
+	"requireSpaceAfterKeywords": [
+		"if",
+		"else",
+		"switch",
+		"case",
+		"for",
+		"while",
+		"do",
+		"try",
+		"throw",
+		"catch",
+		"finally",
+		"void",
+		"new",
+		"delete",
+		"return",
+		"instanceof",
+		"typeof"
+	],
+
+	"disallowKeywordsOnNewLine": ["else"],
+	"disallowKeywords": ["with"],
+
+	// Applies to named and anonymous function declarations and expressions
+	"requireSpacesInFunction":  { "beforeOpeningCurlyBrace": true },
+	"disallowSpacesInFunction": { "beforeOpeningRoundBrace": true },
+
+	"disallowSpacesInCallExpression": true,
+
+	// Identifiers
+	"disallowMultipleVarDecl": "exceptUndefined",
+	"disallowDanglingUnderscores": { "allExcept": ["_super"] },
+	"requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties", // maybe this should be "ignoreProperties"
+	"requireCapitalizedConstructors": true,
+
+	// Object literals
+	"disallowSpaceAfterObjectKeys": true,
+	"requireSpaceBeforeObjectValues": true,
+	"requireCommaBeforeLineBreak": true,
+	"disallowTrailingComma": true,
+
+	// Operators
+	"requireOperatorBeforeLineBreak": true,
+	"disallowOperatorBeforeLineBreak": ["."],
+	"disallowSpaceAfterPrefixUnaryOperators": true,   // ++, --, +, -, ~, !
+	"disallowSpaceBeforePostfixUnaryOperators": true, // ++, --
+	"requireSpaceBeforeBinaryOperators": [
+		"*", "/", "%", "+", "-",                      // Multiplicative and Additive operators
+		"<<", ">>", ">>>",                            // Bitwise shift operators
+		"<", ">", "<=", ">=",                         // Relational operators (excluding instanceof and in)
+		"==", "!=", "===", "!==",                     // Equality operators
+		"&", "|", "^", "&&", "||",                    // Binary bitwise and logical operators
+		"=", "*=", "/=", "%=", "+=", "-=",            // Assignment operators
+		"<<=", ">>=", ">>>=", "&=", "|=", "^="
+	],
+	"disallowSpaceBeforeBinaryOperators": [","],      // Comma operator
+	"requireSpaceAfterBinaryOperators": true,         // All of the above operators
+	"requireSpacesInConditionalExpression": true,     // Ternary operator ? :
+	"disallowYodaConditions": true,
+
+	// Whitespace
+	"disallowMultipleLineBreaks": true,
+	"disallowMixedSpacesAndTabs": "smart",
+	"disallowTrailingWhitespace": true,
+	"requireLineFeedAtFileEnd": true,
+	"validateLineBreaks": "LF",
+	"validateIndentation": "\t",
+	"disallowMultipleLineStrings": true,
+	//"requireLineBreakAfterVariableAssignment": true, // Not supported until jscs 1.9
+	//"requireSpaceBetweenArguments": true // Not supported until jscs 1.9
+
+	// Brackets, Braces and Parentheses
+	"requireSpacesInsideObjectBrackets": "all",   // { a: 1 };
+	"disallowSpacesInsideArrayBrackets": "all",   // [1, 2];
+	"disallowSpacesInsideParentheses":   true,    // (a === b);
+	"requireBlocksOnNewline": 1,
+	"requireSpaceBeforeBlockStatements": true,    // if (condition) { ... }
+	"disallowNewlineBeforeBlockStatements": true, // if (condition) {
+	"disallowEmptyBlocks": true,
+	"requireParenthesesAroundIIFE": true,         // (function(){ ... })();
+	                                              // }
+
+	// Punctuation
+	"validateQuoteMarks": { "mark": "\"", "escape": false },
+	"validateParameterSeparator": ", "
+}
