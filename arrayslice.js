@@ -14,14 +14,14 @@ function toObject(arg) {
 	}
 
 	switch (typeof arg) {
-		case "boolean":
-			return new Boolean(arg);
-		case "number":
-			return new Number(arg);
-		case "string":
-			return new String(arg);
-		default: // "symbol" or "object" or "function"
-			return arg;
+	case "boolean":
+		return new Boolean(arg);
+	case "number":
+		return new Number(arg);
+	case "string":
+		return new String(arg);
+	default: // "symbol" or "object" or "function"
+		return arg;
 	}
 }
 
@@ -88,8 +88,7 @@ let handler = {
 	get(target, property, receiver) {
 		let p = props.get(receiver);
 
-		if (typeof property !== "symbol" &&
-		    Number.isInteger(+property) && +property >= 0) {
+		if (typeof property !== "symbol" && Number.isInteger(+property) && +property >= 0) {
 
 			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
 
@@ -112,7 +111,7 @@ let handler = {
 			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
 
 			if (p.reverse ? property < p.end : property >= p.end) {
-				throw new RangeError("Cannot modify original array out of bounds")
+				throw new RangeError("Cannot modify original array out of bounds");
 			}
 		} else if (property === "length") {
 			let intLen = value >>> 0;
@@ -123,10 +122,10 @@ let handler = {
 
 			if (p.reverse) {
 				let relativeEnd = p.start - intLen;
-				p.end = Math.max(relativeEnd, 0)
+				p.end = Math.max(relativeEnd, 0);
 			} else {
 				let relativeEnd = p.start + intLen;
-				p.end = Math.min(relativeEnd, p.object.length)
+				p.end = Math.min(relativeEnd, p.object.length);
 			}
 
 			p.length = Math.abs(p.end - p.start);
@@ -137,5 +136,4 @@ let handler = {
 	}
 };
 
-module.exports = ArraySlice;
-//export default ArraySlice;
+export default ArraySlice;

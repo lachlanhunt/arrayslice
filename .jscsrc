@@ -50,9 +50,9 @@
 	"disallowSpacesInCallExpression": true,
 
 	// Identifiers
-	"disallowMultipleVarDecl": "exceptUndefined",
+	"disallowMultipleVarDecl": { "allExcept": "undefined" },
 	"disallowDanglingUnderscores": { "allExcept": ["_super"] },
-	"requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties", // maybe this should be "ignoreProperties"
+	"requireCamelCaseOrUpperCaseIdentifiers": true,
 	"requireCapitalizedConstructors": true,
 
 	// Object literals
@@ -86,10 +86,10 @@
 	"disallowTrailingWhitespace": true,
 	"requireLineFeedAtFileEnd": true,
 	"validateLineBreaks": "LF",
-	"validateIndentation": "\t",
+	//"validateIndentation": "\t", // Disabled because it conflicts with ESLint handling of switch/case indentation
 	"disallowMultipleLineStrings": true,
-	//"requireLineBreakAfterVariableAssignment": true, // Not supported until jscs 1.9
-	//"requireSpaceBetweenArguments": true // Not supported until jscs 1.9
+	"requireLineBreakAfterVariableAssignment": true,
+	"requireSpaceBetweenArguments": true,
 
 	// Brackets, Braces and Parentheses
 	"requireSpacesInsideObjectBrackets": "all",   // { a: 1 };
