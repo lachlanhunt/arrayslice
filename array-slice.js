@@ -2,35 +2,6 @@
 let props = new WeakMap();
 
 /**
- * Verify that the the length value is within the permissable range. The value must
- * be within the valid 32 bit unsigned int range permitted for use with JS Arrays
- * when added to the given start value, which must itself be valid.
- *
- * @param start The value given as the starting index.
- * @param length The value given as the length of the array slice.
- * @returns {Array<Number>} The start and length values cast to integers.
- * @throws {RangeError} Will throw if start or length values are not integers between 0 and 2^32-1.
- */
-function validateLength(start, length) {
-	start = +start;
-	length = +length;
-
-	let intStart = start >>> 0;
-	let intLen = length >>> 0;
-
-	if (intStart !== start) {
-		throw new RangeError("Invalid start index");
-	}
-
-	if (intLen !== length ||
-		((intLen + start) >>> 0) !== (intLen + start)) {
-		throw new RangeError("Invalid array length");
-	}
-
-	return [intStart, intLen];
-}
-
-/**
  * Implementation of the ECMAScript ToObject abstract operation
  *
  * @param arg Any value
@@ -82,6 +53,8 @@ function toInteger(arg) {
  */
 
 function ArraySlice(array = [], start = 0, end) {
+	// The following implements steps 1 to 6 of the ECMAScript Array.prototype.slice algorithm
+	// for determing the starting and ending indicies
 	let o = toObject(array);
 	let len = o.length;
 
@@ -95,13 +68,14 @@ function ArraySlice(array = [], start = 0, end) {
 		Math.max((len + relativeEnd), 0) :
 		Math.min(relativeEnd, len);
 
-	let count = Math.abs(final - k);
+	// Take the absolute value of the difference in order to support reverse sequences
+	let length = Math.abs(final - k);
 
 	let proxy = new Proxy(o, handler);
 
 	props.set(proxy, {
 		object: o,
-		length: count,
+		length: length,
 		start: k,
 		end: final,
 		reverse: k > final
@@ -141,9 +115,21 @@ let handler = {
 				throw new RangeError("Cannot modify original array out of bounds")
 			}
 		} else if (property === "length") {
-			let [, length] = validateLength(p.start, value);
-			p.end = Math.min(p.start + length, p.object.length)
-			p.length = p.end - p.start;
+			let intLen = value >>> 0;
+
+			if (intLen !== +value) {
+				throw new RangeError("Invalid array length");
+			}
+
+			if (p.reverse) {
+				let relativeEnd = p.start - intLen;
+				p.end = Math.max(relativeEnd, 0)
+			} else {
+				let relativeEnd = p.start + intLen;
+				p.end = Math.min(relativeEnd, p.object.length)
+			}
+
+			p.length = Math.abs(p.end - p.start);
 			return true;
 		}
 
