@@ -2,7 +2,7 @@
   "name": "arrayslice",
   "version": "0.0.1",
   "description": "A library for creating a virtual array slice using a Proxy to re-map array indicies to the orginal array.",
-  "main": "arrayslice.js",
+  "main": "index.js",
   "dependencies": {},
   "devDependencies": {
     "eslint": "^2.12.0",
