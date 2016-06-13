@@ -51,7 +51,7 @@ describe("ArraySlice length", function() {
 
 		expect(() => b.length = -1).toThrowError(RangeError);
 		expect(() => b.length = 5.2).toThrowError(RangeError);
-		expect(() => b.length = Math.pow(2, 32)).toThrowError(RangeError);
+		expect(() => b.length = Math.pow(2, 53)).toThrowError(RangeError);
 		expect(() => b.length = Infinity).toThrowError(RangeError);
 		expect(() => b.length = NaN).toThrowError(RangeError);
 		expect(() => b.length = "a").toThrowError(RangeError);
