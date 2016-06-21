@@ -112,4 +112,45 @@ describe("ArraySlice length", function() {
 		expect(b[0]).toBe(a[4]);
 		expect(b[4]).toBe(a[8]);
 	});
+
+	it("should not be less than 0", function() {
+		let a = {length: -1};
+		let b = ArraySlice(a, 0, a.length);
+		let c = {length: -Infinity};
+		let d = ArraySlice(c, 0, c.length);
+
+		expect(b.length).toBe(0);
+		expect(d.length).toBe(0);
+	});
+
+	it("should be limited to the maximum of 2^53-1", function() {
+		let a = {length: Math.pow(2, 53)};
+		let b = ArraySlice(a, 0, a.length);
+		let c = {length: Infinity};
+		let d = ArraySlice(c, 0, c.length);
+
+		expect(b.length).toBe(Math.pow(2, 53) - 1);
+		expect(d.length).toBe(Math.pow(2, 53) - 1);
+	});
+
+	it("should treat a length of null as 0", function() {
+		let a = {length: null};
+		let b = ArraySlice(a, 0, 1);
+
+		expect(b.length).toBe(0);
+	});
+
+	it("should treat a length of undefined as 0", function() {
+		let a = {length: undefined};
+		let b = ArraySlice(a, 0, 1);
+
+		expect(b.length).toBe(0);
+	});
+
+	it("should treat a length of NaN as 0", function() {
+		let a = {length: NaN};
+		let b = ArraySlice(a, 0, 1);
+
+		expect(b.length).toBe(0);
+	});
 });
