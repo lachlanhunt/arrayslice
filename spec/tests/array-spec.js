@@ -42,17 +42,20 @@ describe("Array prototype method", function() {
 		expect(b).toEqual(a);
 	});
 
-/*
-	it(".filter() should ", function() {
-		let a = [0,1,2,3,4,5,6,7,8,9];
+	it(".filter() should only return matching values within the slice", function() {
+		function isOdd(n) {
+			return !!(n % 2);
+		}
+
+		let a = [3,5,7];
 		let b = [0,1,2,3,4,5,6,7,8,9];
 		let c = ArraySlice(b, 3, 8);
+		let d = c.filter(isOdd);
 
-		c.filter();
-
-		expect(b).toEqual(a);
+		expect(d).toEqual(a);
 	});
 
+	/*
 	it(".find() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
