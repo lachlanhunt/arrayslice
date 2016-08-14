@@ -1,6 +1,6 @@
 {
   "name": "arrayslice",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A library for creating a virtual array slice using a Proxy to re-map array indicies to the orginal array.",
   "main": "index.js",
   "dependencies": {},
