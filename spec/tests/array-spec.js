@@ -1,6 +1,10 @@
 describe("Array prototype method", function() {
 	let ArraySlice = require("../../lib/ArraySlice");
 
+	function callMethod(method) {
+		this[method]();
+	}
+
 	it(".concat() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,0,0,0,1,2,3,4,8,9];
@@ -146,27 +150,22 @@ describe("Array prototype method", function() {
 
 		expect(b).toEqual(a);
 	});
+ */
 
 	it(".pop() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.pop();
-
-		expect(b).toEqual(a);
+		expect(callMethod.bind(b, "pop")).toThrowError(TypeError, "Cannot call pop method on ArraySlice instances");
 	});
 
-	it(".push() should ", function() {
+	it(".push() should throw a TypeError", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.push();
-
-		expect(b).toEqual(a);
+		expect(callMethod.bind(b, "push")).toThrowError(TypeError, "Cannot call push method on ArraySlice instances");
 	});
-
+/*
 	it(".reduce() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
@@ -196,17 +195,14 @@ describe("Array prototype method", function() {
 
 		expect(b).toEqual(a);
 	});
-
+*/
 	it(".shift() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.shift();
-
-		expect(b).toEqual(a);
+		expect(callMethod.bind(b, "shift")).toThrowError(TypeError, "Cannot call shift method on ArraySlice instances");
 	});
-
+/*
 	it(".slice() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
@@ -280,17 +276,14 @@ describe("Array prototype method", function() {
 
 		expect(b).toEqual(a);
 	});
-
+*/
 	it(".unshift() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.unshift();
-
-		expect(b).toEqual(a);
+		expect(callMethod.bind(b, "unshift")).toThrowError(TypeError, "Cannot call unshift method on ArraySlice instances");
 	});
-
+/*
 	it(".entries() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
