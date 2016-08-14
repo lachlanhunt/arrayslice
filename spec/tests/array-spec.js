@@ -55,27 +55,29 @@ describe("Array prototype method", function() {
 		expect(d).toEqual(a);
 	});
 
-	/*
-	it(".find() should ", function() {
-		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+	it(".find() should search for a value only within the slice", function() {
+		let a = [7,0,5,1,4,2,8,3,6,9];
+		let b = ArraySlice(a, 3, 8);
 
-		c.find();
+		let c = b.find(function(n) {
+			return n >= 3 && n <= 5;
+		});
 
-		expect(b).toEqual(a);
+		expect(c).toBe(4);
 	});
 
 	it(".findIndex() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.findIndex();
+		let c = b.findIndex(function(n) {
+			return n === 5;
+		});
 
-		expect(b).toEqual(a);
+		expect(c).toBe(2);
 	});
 
+	 /*
 	it(".forEach() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
@@ -95,17 +97,16 @@ describe("Array prototype method", function() {
 
 		expect(b).toEqual(a);
 	});
-
+*/
 	it(".indexOf() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
-		let c = ArraySlice(b, 3, 8);
+		let b = ArraySlice(a, 3, 8);
 
-		c.indexOf();
+		let c = b.indexOf(5);
 
-		expect(b).toEqual(a);
+		expect(c).toBe(2);
 	});
-
+/*
 	it(".join() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
@@ -115,17 +116,17 @@ describe("Array prototype method", function() {
 
 		expect(b).toEqual(a);
 	});
-
+*/
 	it(".keys() should ", function() {
-		let a = [0,1,2,3,4,5,6,7,8,9];
-		let b = [0,1,2,3,4,5,6,7,8,9];
+		let a = [0,1,2,3,4];
+		let b = [9,8,7,6,5,4,3,2,1,0];
 		let c = ArraySlice(b, 3, 8);
 
-		c.keys();
+		let d = [...c.keys()];
 
-		expect(b).toEqual(a);
+		expect(d).toEqual(a);
 	});
-
+/*
 	it(".lastIndexOf() should ", function() {
 		let a = [0,1,2,3,4,5,6,7,8,9];
 		let b = [0,1,2,3,4,5,6,7,8,9];
