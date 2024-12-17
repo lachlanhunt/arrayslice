@@ -1,0 +1,42 @@
+{
+    "include": [
+        "*.ts",
+        "lib/**/*.ts",
+        "eslint.config.mjs",
+        "babel.config.cjs"
+    ],
+    "exclude": [
+        "spec/**/*",
+        "**/dist/**/*"
+    ],
+    "compilerOptions": {
+        /* Base Options: */
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "target": "ESNext",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "moduleDetection": "force",
+        "isolatedModules": true,
+        /* Strictness */
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noPropertyAccessFromIndexSignature": true,
+        // "noUncheckedIndexedAccess": true,
+        /* Transpiling with TypeScript: */
+        "moduleResolution": "Node",
+        "module": "ESNext",
+        "outDir": "dist",
+        "sourceMap": true,
+        "lib": [
+            "ESNext"
+        ],
+        // Include the .d.ts files for the library
+        "declaration": true,
+        "types": [
+            "vitest/globals"
+        ]
+    }
+}
