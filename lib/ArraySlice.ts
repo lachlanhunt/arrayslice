@@ -1,53 +1,25 @@
 "use strict";
+import type { ArraySliceProperties } from "./types";
+import { toInteger, toLength } from "./utils";
 
-// Private properties
-let props = new WeakMap();
+const unsupportedProperties = ["push", "pop", "shift", "unshift"] as const;
+type UnsupportedProperty = (typeof unsupportedProperties)[number];
 
-/**
- * Check if the given object is supported
- *
- * @param arg Any value
- * @returns {*}
- * @throws TypeError if value of `arg` is `null`, `undefined`, an instance of `String`, or a primitive type
- *         boolean, number or string.
- */
-function checkObject(arg) {
-	if (arg === null || arg === undefined) {
-		throw new TypeError(`Can't convert ${arg} to object`);
-	} else if (arg instanceof String) {
-		throw new TypeError("Cannot slice instances of String");
-	} else if (typeof arg === "object") {
-		return arg;
-	}
+const isUnsupported = (property: string | symbol): property is UnsupportedProperty => {
+    return typeof property === "string" && (unsupportedProperties as readonly string[]).includes(property);
+};
 
-	throw new TypeError("Cannot slice type " + typeof arg);
-}
+const isNumericIndex = (index: number | null): index is number => {
+    return index !== null && Number.isInteger(index) && index >= 0;
+};
 
-/**
- * Implementation of the ECMAScript ToInteger abstract operation
- *
- * @param arg Any value
- * @returns {*}
- * @throws TypeError if value of `arg` is null or undefined.
- */
-function toInteger(arg) {
-	let number = +arg;
-	if (Object.is(number, NaN)) {
-		return 0;
-	} else if (number === 0 || number === Infinity || number === -Infinity) {
-		return number;
-	} else {
-		return Math.sign(number) * Math.floor(Math.abs(number));
-	}
-}
+const resolveIndex = (p: ArraySliceProperties, index: number) => {
+    const mappedIndex = p.reverse ? p.start - index - 1 : p.start + index;
 
-function toLength(arg) {
-	let len = toInteger(arg);
-	if (len <= 0) {
-		return 0;
-	}
-	return Math.min(len, Math.pow(2, 53) - 1);
-}
+    const isInRange = p.reverse ? mappedIndex < p.end : mappedIndex >= p.end;
+
+    return isInRange ? Symbol("out of bounds") : `${mappedIndex}`;
+};
 
 /**
  * Create a Proxy that wraps the given numerically indexed object (Array or Array-like objects) and represents
@@ -129,95 +101,90 @@ function toLength(arg) {
  *              end of the array.
  * @returns {Proxy}
  */
-function ArraySlice(array, start, end) {
-	let o = checkObject(array);
+export const ArraySlice = <T>(array: T[], start: number, end?: number) => {
+    // The following partially implements steps 2 to 6 of the ECMAScript Array.prototype.slice algorithm
+    // for determing the starting and ending indexes.
+    const len = toLength(array.length);
 
-	// The following partially implements steps 2 to 6 of the ECMAScript Array.prototype.slice algorithm
-	// for determing the starting and ending indexes.
-	let len = toLength(o.length);
+    const relativeStart = toInteger(start);
+    const k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-	let relativeStart = toInteger(start);
-	let k = (relativeStart < 0) ?
-		Math.max((len + relativeStart), 0) :
-		Math.min(relativeStart, len);
+    const relativeEnd = end === undefined ? len : toInteger(end);
+    const final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-	let relativeEnd = (end === undefined) ? len : toInteger(end);
-	let final = relativeEnd < 0 ?
-		Math.max((len + relativeEnd), 0) :
-		Math.min(relativeEnd, len);
+    // Take the absolute value of the difference in order to support reverse sequences
+    const length = Math.abs(final - k);
 
-	// Take the absolute value of the difference in order to support reverse sequences
-	let length = Math.abs(final - k);
+    const properties: ArraySliceProperties = {
+        object: array,
+        length: length,
+        start: k,
+        end: final,
+        reverse: k > final,
+    };
 
-	let proxy = new Proxy(o, handler);
+    const handler: ProxyHandler<T[]> = {
+        get(target, property, receiver) {
+            const p = properties;
 
-	props.set(proxy, {
-		object: o,
-		length: length,
-		start: k,
-		end: final,
-		reverse: k > final
-	});
+            const index = typeof property === "symbol" ? null : +property;
 
-	return proxy;
-}
+            if (isNumericIndex(index)) {
+                property = resolveIndex(p, index);
+            } else if (property === "length") {
+                return length;
+            } else if (isUnsupported(property)) {
+                const method = ((prop) => () => {
+                    throw new TypeError(`Cannot call ${prop} method on ArraySlice instances`);
+                })(property);
 
-let handler = {
-	get(target, property, receiver) {
-		let p = props.get(receiver);
+                return method;
+            }
 
-		if (typeof property !== "symbol" && Number.isInteger(+property) && +property >= 0) {
+            if (Reflect.has(target, property)) {
+                const result = Reflect.get(target, property as keyof typeof target, receiver);
+                //    ^?
+                return result;
+            }
+            const result = Reflect.get(target, property as keyof typeof target, receiver);
+            //    ^?
+            return result;
+        },
 
-			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
+        set(target, property, value, receiver) {
+            const p = properties;
 
-			if (p.reverse ? property < p.end : property >= p.end) {
-				return undefined;
-			}
-		} else if (property === "length") {
-			return p.length;
-		} else if (property === "push" || property === "pop" ||
-			       property === "shift" || property === "unshift") {
-			return function() {
-				throw new TypeError(`Cannot call ${property} method on ArraySlice instances`);
-			};
-		}
+            const index = typeof property === "symbol" ? null : +property;
 
-		return Reflect.get(target, property, receiver);
-	},
+            if (isNumericIndex(index)) {
+                property = resolveIndex(p, index);
 
-	set(target, property, value, receiver) {
-		let p = props.get(receiver);
+                if (typeof property === "symbol") {
+                    throw new RangeError("Cannot modify original array out of bounds");
+                }
+            } else if (property === "length") {
+                const intLen = toLength(value as number);
 
-		if (typeof property !== "symbol" &&
-			Number.isInteger(+property) && +property >= 0) {
+                if (intLen !== +value) {
+                    throw new RangeError("Invalid array length");
+                }
 
-			property = p.reverse ? p.start - (+property) - 1 : p.start + (+property);
+                if (p.reverse) {
+                    const relativeEnd = p.start - intLen;
+                    p.end = Math.max(relativeEnd, 0);
+                } else {
+                    const relativeEnd = p.start + intLen;
+                    p.end = Math.min(relativeEnd, p.object.length);
+                }
 
-			if (p.reverse ? property < p.end : property >= p.end) {
-				throw new RangeError("Cannot modify original array out of bounds");
-			}
-		} else if (property === "length") {
-			let intLen = toLength(value);
+                p.length = Math.abs(p.end - p.start);
+                return true;
+            }
 
-			if (intLen !== +value) {
-				throw new RangeError("Invalid array length");
-			}
+            return Reflect.set(target, property, value, receiver);
+        },
+    };
+    const proxy = new Proxy(array, handler);
 
-			if (p.reverse) {
-				let relativeEnd = p.start - intLen;
-				p.end = Math.max(relativeEnd, 0);
-			} else {
-				let relativeEnd = p.start + intLen;
-				p.end = Math.min(relativeEnd, p.object.length);
-			}
-
-			p.length = Math.abs(p.end - p.start);
-			return true;
-		}
-
-		return Reflect.set(target, property, value, receiver);
-	}
+    return proxy;
 };
-
-module.exports = ArraySlice;
-// export default ArraySlice;
