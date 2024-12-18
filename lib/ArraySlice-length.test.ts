@@ -54,7 +54,9 @@ describe("ArraySlice length", function () {
         expect(() => (b.length = Math.pow(2, 53))).toThrowError(RangeError);
         expect(() => (b.length = Infinity)).toThrowError(RangeError);
         expect(() => (b.length = NaN)).toThrowError(RangeError);
+        /* @ts-expect-error assigning non-numeric value to length */
         expect(() => (b.length = "a")).toThrowError(RangeError);
+        /* @ts-expect-error assigning non-numeric value to length */
         expect(() => (b.length = undefined)).toThrowError(RangeError);
     });
 
@@ -135,6 +137,7 @@ describe("ArraySlice length", function () {
 
     it("should treat a length of null as 0", function () {
         const a = { length: null };
+        /* @ts-expect-error invalid array-like object */
         const b = ArraySlice(a, 0, 1);
 
         expect(b.length).toBe(0);
@@ -142,6 +145,7 @@ describe("ArraySlice length", function () {
 
     it("should treat a length of undefined as 0", function () {
         const a = { length: undefined };
+        /* @ts-expect-error invalid array-like object */
         const b = ArraySlice(a, 0, 1);
 
         expect(b.length).toBe(0);

@@ -25,9 +25,34 @@ export const toInteger = (n: number) => {
 };
 
 export const toLength = (arg: number) => {
-    const len = toInteger(arg);
+    const len = toInteger(+arg);
     if (len <= 0) {
         return 0;
     }
     return Math.min(len, Math.pow(2, 53) - 1);
+};
+
+export const unsupportedProperties = ["push", "pop", "shift", "unshift"] as const;
+export type UnsupportedProperty = (typeof unsupportedProperties)[number];
+
+export const isUnsupported = (property: string | symbol): property is UnsupportedProperty => {
+    return typeof property === "string" && (unsupportedProperties as readonly string[]).includes(property);
+};
+
+export const isNumericIndex = (index: number | null): index is number => {
+    return index !== null && Number.isInteger(index) && index >= 0;
+};
+
+export const toRelativeIndex = (index: number, len: number) => {
+    const initialIndex = toInteger(index);
+    const relativeIndex = initialIndex < 0 ? Math.max(len + initialIndex, 0) : Math.min(initialIndex, len);
+    return relativeIndex;
+};
+
+export const resolveIndex = (isReverse: boolean, start: number, end: number, index: number) => {
+    const mappedIndex = isReverse ? start - index - 1 : start + index;
+
+    const isInRange = isReverse ? mappedIndex < end : mappedIndex >= end;
+
+    return isInRange ? Symbol("out of bounds") : `${mappedIndex}`;
 };

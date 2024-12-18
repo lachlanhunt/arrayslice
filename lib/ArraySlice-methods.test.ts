@@ -32,7 +32,7 @@ describe("Array prototype method", function () {
         expect(b.every(callback)).toBe(true);
     });
 
-    it.only(".fill() should set values only within the slice", function () {
+    it(".fill() should set values only within the slice", function () {
         const a = [0, 1, 2, 0, 0, 0, 0, 0, 8, 9];
         const b = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         const c = ArraySlice(b, 3, 8);
@@ -43,7 +43,7 @@ describe("Array prototype method", function () {
     });
 
     it(".filter() should only return matching values within the slice", function () {
-        function isOdd(n) {
+        function isOdd(n: number) {
             return !!(n % 2);
         }
 
@@ -224,7 +224,7 @@ describe("Array prototype method", function () {
         const b = [8, 9, 6, 1, 5, 7, 0, 2, 4, 3];
         const c = ArraySlice(b, 3, 8);
 
-        function compareNumbers(a, b) {
+        function compareNumbers(a: number, b: number) {
             return a - b;
         }
 

@@ -170,4 +170,16 @@ describe("ArraySlice", function () {
         expect(b[4]).toBe(a[3]);
         expect(b[5]).toBeUndefined();
     });
+
+    it("should support setting symbol properties", function () {
+        const a = [0, 1, 2, 3, 4];
+        const b = ArraySlice(a, 0, a.length);
+
+        const prop = Symbol("test");
+        // @ts-expect-error - Testing symbol properties
+        b[prop] = 5;
+
+        // @ts-expect-error - Testing symbol properties
+        expect(b[prop]).toBe(5);
+    });
 });

@@ -1,25 +1,4 @@
-"use strict";
-import type { ArraySliceProperties } from "./types";
-import { toInteger, toLength } from "./utils";
-
-const unsupportedProperties = ["push", "pop", "shift", "unshift"] as const;
-type UnsupportedProperty = (typeof unsupportedProperties)[number];
-
-const isUnsupported = (property: string | symbol): property is UnsupportedProperty => {
-    return typeof property === "string" && (unsupportedProperties as readonly string[]).includes(property);
-};
-
-const isNumericIndex = (index: number | null): index is number => {
-    return index !== null && Number.isInteger(index) && index >= 0;
-};
-
-const resolveIndex = (p: ArraySliceProperties, index: number) => {
-    const mappedIndex = p.reverse ? p.start - index - 1 : p.start + index;
-
-    const isInRange = p.reverse ? mappedIndex < p.end : mappedIndex >= p.end;
-
-    return isInRange ? Symbol("out of bounds") : `${mappedIndex}`;
-};
+import { isNumericIndex, isUnsupported, resolveIndex, toLength, toRelativeIndex } from "./utils";
 
 /**
  * Create a Proxy that wraps the given numerically indexed object (Array or Array-like objects) and represents
@@ -99,38 +78,31 @@ const resolveIndex = (p: ArraySliceProperties, index: number) => {
  *              end of the array.
  * @param end   The ending index for the slice. If the value is negative, it is treated as an offset from the
  *              end of the array.
- * @returns {Proxy}
+ * @returns the proxied object representing the slice of the original array.
  */
-export const ArraySlice = <T>(array: T[], start: number, end?: number) => {
+export const ArraySlice = <T, TArray extends T[] | ArrayLike<T>>(
+    array: TArray,
+    start = 0,
+    end: number = array.length,
+) => {
     // The following partially implements steps 2 to 6 of the ECMAScript Array.prototype.slice algorithm
     // for determing the starting and ending indexes.
     const len = toLength(array.length);
 
-    const relativeStart = toInteger(start);
-    const k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
-
-    const relativeEnd = end === undefined ? len : toInteger(end);
-    const final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+    const relativeStart = toRelativeIndex(start, len);
+    let relativeEnd = toRelativeIndex(end, len);
 
     // Take the absolute value of the difference in order to support reverse sequences
-    const length = Math.abs(final - k);
+    let length = Math.abs(relativeEnd - relativeStart);
 
-    const properties: ArraySliceProperties = {
-        object: array,
-        length: length,
-        start: k,
-        end: final,
-        reverse: k > final,
-    };
+    const isReverse = relativeStart > relativeEnd;
 
-    const handler: ProxyHandler<T[]> = {
+    const handler: ProxyHandler<TArray> = {
         get(target, property, receiver) {
-            const p = properties;
-
             const index = typeof property === "symbol" ? null : +property;
 
             if (isNumericIndex(index)) {
-                property = resolveIndex(p, index);
+                property = resolveIndex(isReverse, relativeStart, relativeEnd, index);
             } else if (property === "length") {
                 return length;
             } else if (isUnsupported(property)) {
@@ -141,23 +113,14 @@ export const ArraySlice = <T>(array: T[], start: number, end?: number) => {
                 return method;
             }
 
-            if (Reflect.has(target, property)) {
-                const result = Reflect.get(target, property as keyof typeof target, receiver);
-                //    ^?
-                return result;
-            }
-            const result = Reflect.get(target, property as keyof typeof target, receiver);
-            //    ^?
-            return result;
+            return Reflect.get(target, property as keyof typeof target, receiver);
         },
 
         set(target, property, value, receiver) {
-            const p = properties;
-
             const index = typeof property === "symbol" ? null : +property;
 
             if (isNumericIndex(index)) {
-                property = resolveIndex(p, index);
+                property = resolveIndex(isReverse, relativeStart, relativeEnd, index);
 
                 if (typeof property === "symbol") {
                     throw new RangeError("Cannot modify original array out of bounds");
@@ -169,22 +132,20 @@ export const ArraySlice = <T>(array: T[], start: number, end?: number) => {
                     throw new RangeError("Invalid array length");
                 }
 
-                if (p.reverse) {
-                    const relativeEnd = p.start - intLen;
-                    p.end = Math.max(relativeEnd, 0);
+                if (isReverse) {
+                    const updatedEnd = relativeStart - intLen;
+                    relativeEnd = Math.max(updatedEnd, 0);
                 } else {
-                    const relativeEnd = p.start + intLen;
-                    p.end = Math.min(relativeEnd, p.object.length);
+                    const updatedEnd = relativeStart + intLen;
+                    relativeEnd = Math.min(updatedEnd, array.length);
                 }
 
-                p.length = Math.abs(p.end - p.start);
+                length = Math.abs(relativeEnd - relativeStart);
                 return true;
             }
 
             return Reflect.set(target, property, value, receiver);
         },
     };
-    const proxy = new Proxy(array, handler);
-
-    return proxy;
+    return new Proxy(array, handler);
 };
