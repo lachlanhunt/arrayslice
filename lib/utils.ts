@@ -32,7 +32,7 @@ export const toLength = (arg: number) => {
     return Math.min(len, Math.pow(2, 53) - 1);
 };
 
-export const unsupportedProperties = ["push", "pop", "shift", "unshift"] as const;
+export const unsupportedProperties = ["push", "pop", "shift", "unshift", "splice"] as const;
 export type UnsupportedProperty = (typeof unsupportedProperties)[number];
 
 export const isUnsupported = (property: string | symbol): property is UnsupportedProperty => {
