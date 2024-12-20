@@ -1,3 +1,5 @@
+import type { Tagged } from "./types";
+
 /**
  * Checks if a value is an array-like object
  * @param o The object to check
@@ -39,7 +41,7 @@ export const isUnsupported = (property: string | symbol): property is Unsupporte
     return typeof property === "string" && (unsupportedProperties as readonly string[]).includes(property);
 };
 
-export const isNumericIndex = (index: number | null): index is number => {
+export const isNumericIndex = (index: number | null): index is Tagged<number, "index"> => {
     return index !== null && Number.isInteger(index) && index >= 0;
 };
 
