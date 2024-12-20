@@ -1,15 +1,6 @@
 import type { Tagged } from "./types";
 
 /**
- * Checks if a value is an array-like object
- * @param o The object to check
- * @returns True if the object is an array-like object, false otherwise
- */
-export const isArrayLike = <T>(o: unknown): o is ArrayLike<T> => typeof o === "object" && o !== null && "length" in o;
-
-export const isArray = <T>(o: unknown): o is T[] => Array.isArray(o);
-
-/**
  * Implementation of the ECMAScript ToInteger abstract operation
  *
  * @param arg Any value
