@@ -3,17 +3,23 @@
     "packageManager": "yarn@4.5.3",
     "version": "0.1.0",
     "description": "A library for creating a virtual array slice using a Proxy to re-map array indicies to the orginal array.",
-    "main": "index.js",
+    "exports": {
+        ".": "./lib/ArraySlice.js"
+    },
+    "types": "./lib/ArraySlice.d.ts",
     "type": "module",
+    "files": [
+        "lib/**/*"
+    ],
     "scripts": {
         "postinstall": "husky install",
         "prepack": "pinst --disable",
         "postpack": "pinst --enable",
         "test": "vitest",
         "lint": "eslint .",
-        "docs": "jsdoc -c jsdoc.conf.json",
         "typecheck": "tsc --noEmit",
         "build": "tsc --project tsconfig.build.json",
+        "docs": "jsdoc -c jsdoc.conf.json",
         "sdks": "yarn dlx @yarnpkg/sdks vscode"
     },
     "keywords": [

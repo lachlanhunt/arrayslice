@@ -1,14 +1,6 @@
 {
-    "include": [
-        "*.ts",
-        "lib/**/*.ts",
-        "eslint.config.mjs",
-        "babel.config.cjs"
-    ],
-    "exclude": [
-        "spec/**/*",
-        "**/dist/**/*"
-    ],
+    "include": ["*.ts", "src/**/*.ts", "eslint.config.mjs", "babel.config.cjs"],
+    "exclude": ["spec/**/*", "**/lib/**/*"],
     "compilerOptions": {
         /* Base Options: */
         "esModuleInterop": true,
@@ -28,15 +20,11 @@
         /* Transpiling with TypeScript: */
         "moduleResolution": "Node",
         "module": "ESNext",
-        "outDir": "dist",
+        "outDir": "lib",
         "sourceMap": true,
-        "lib": [
-            "ESNext"
-        ],
+        "lib": ["ESNext"],
         // Include the .d.ts files for the library
         "declaration": true,
-        "types": [
-            "vitest/globals"
-        ]
+        "types": ["vitest/globals"]
     }
 }
